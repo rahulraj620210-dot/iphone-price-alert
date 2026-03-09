@@ -1,12 +1,15 @@
 name: iPhone Price Checker
 
 on:
+  workflow_dispatch:
+  push:
   schedule:
     - cron: "*/15 * * * *"
 
 jobs:
   check-price:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
