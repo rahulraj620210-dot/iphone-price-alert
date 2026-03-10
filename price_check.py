@@ -8,7 +8,7 @@ URL = "https://www.flipkart.com/apple-iphone-16-pro-desert-titanium-128-gb/p/itm
 TARGET_PRICE = 89000
 
 EMAIL = "bhaiyamax080@gmail.com"
-PASSWORD = "abcd efgh ijkl mnop"
+PASSWORD = "mkfkvzkygcbgqulo"
 
 headers = {
     "User-Agent": "Mozilla/5.0"
@@ -49,11 +49,14 @@ if price_tag:
 
     if price <= TARGET_PRICE:
 
-        msg = MIMEText(
-        f"🔥 Price Drop Alert!\n\n"
-        f"Current Price: ₹{price}\n\n"
-        f"Buy now:\n{URL}"
-        )
+        msg = MIMEText(f"""
+🔥 Price Drop Alert!
+
+Current Price: ₹{price}
+
+Buy now:
+{URL}
+""")
 
         msg["Subject"] = "iPhone Price Drop Alert"
         msg["From"] = EMAIL
