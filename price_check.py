@@ -109,7 +109,7 @@ if not os.path.exists("activated.txt"):
 
 """Tracker start ho gaya hai
 
-Har 2 minute price check hoga samjha na rahul Malik.
+Har 2 minute price check hoga samjha na rahul Malik. FUKKKKKKKKKKKKKKKKKKK.....
 
 Price range match hua to instant alert
 
