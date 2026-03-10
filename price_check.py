@@ -1,45 +1,46 @@
 import requests
 from bs4 import BeautifulSoup
 import smtplib
+from email.mime.text import MIMEText
 
-URL = "https://dl.flipkart.com/dl/apple-iphone-16-pro-desert-titanium-128-gb/p/itm5a8453e89cbd4"
+URL = "https://www.flipkart.com/apple-iphone-16-pro-desert-titanium-128-gb/p/itm5a8453e89cbd4"
 
 TARGET_PRICE = 89000
 
+EMAIL = "rahulraj620210@gmail.com"
+PASSWORD = "RAHULRAJ@999"
+
 headers = {
-    "User-Agent": "Mozilla/5.0"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 }
 
-page = requests.get(URL, headers=headers)
-soup = BeautifulSoup(page.content, "html.parser")
+response = requests.get(URL, headers=headers, timeout=20)
 
-price_text = soup.find("div", {"class": "_30jeq3"}).text
-price = int(price_text.replace("₹","").replace(",",""))
+soup = BeautifulSoup(response.text, "html.parser")
 
-print("Current price:", price)
+price_tag = soup.find("div", {"class": "Nx9bqj CxhGGd"})
 
-if price <= TARGET_PRICE:
+if price_tag:
+    price = int(price_tag.text.replace("₹","").replace(",",""))
+    print("Current price:", price)
 
-    sender_email = "rahulraj620210@gmail.com"
-    password = "RAHULRAJ@999"
+    if price <= TARGET_PRICE:
 
-    server = smtplib.SMTP("smtp.gmail.com",587)
-    server.starttls()
+        msg = MIMEText(f"Price dropped to ₹{price}\n{URL}")
+        msg["Subject"] = "iPhone Price Alert"
+        msg["From"] = EMAIL
+        msg["To"] = EMAIL
 
-    server.login(sender_email,password)
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(EMAIL, PASSWORD)
+        server.sendmail(EMAIL, EMAIL, msg.as_string())
+        server.quit()
 
-    message = f"""Subject:iPhone Price Alert
+        print("Email sent")
 
-🔥 iPhone 16 Pro price dropped!
+    else:
+        print("Price still high")
 
-Current Price: ₹{price}
-
-Buy Now:
-{URL}
-"""
-
-    server.sendmail(sender_email,sender_email,message)
-
-    server.quit()
-
-    print("Alert sent!")
+else:
+    print("Price not found")
