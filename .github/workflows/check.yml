@@ -2,7 +2,6 @@ name: iPhone Price Checker
 
 on:
   workflow_dispatch:
-  push:
   schedule:
     - cron: "*/15 * * * *"
 
