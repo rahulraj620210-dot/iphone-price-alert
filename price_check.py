@@ -4,9 +4,11 @@ import smtplib
 from email.mime.text import MIMEText
 import datetime
 import os
+import re
+import json
 
 EMAIL = "bhaiyamax080@gmail.com"
-PASSWORD = "mkfk vzky gcbg qulo"
+PASSWORD = "mkfkvzkygcbgqulo"
 
 products = [
 
@@ -53,8 +55,9 @@ products = [
 ]
 
 headers = {
-"User-Agent":
-"Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+"Accept-Language":"en-IN,en;q=0.9",
+"Connection":"keep-alive"
 }
 
 def send_mail(subject,body):
@@ -73,7 +76,30 @@ def send_mail(subject,body):
 
     server.quit()
 
-# -------- ACTIVATION MAIL (ONLY ONCE) --------
+
+def extract_price(text):
+
+    prices = re.findall(r"₹\s?[\d,]+", text)
+
+    if prices:
+        p = prices[0].replace("₹","").replace(",","")
+        return int(p)
+
+    return None
+
+
+price_memory_file = "price_memory.json"
+
+if os.path.exists(price_memory_file):
+
+    with open(price_memory_file) as f:
+        price_memory = json.load(f)
+
+else:
+    price_memory = {}
+
+
+# -------- ACTIVATION MAIL --------
 
 if not os.path.exists("activated.txt"):
 
@@ -81,17 +107,18 @@ if not os.path.exists("activated.txt"):
 
     "Price Tracker Activated",
 
-"""✅ Tracker start ho gaya hai
+"""Tracker start ho gaya hai
 
 Har 5 minute price check hoga
 
-Aur har din 7 PM report milegi
+Price range match hua to instant alert
+
+Daily report 7 PM
 """
     )
 
     open("activated.txt","w").close()
 
-# -------- PRICE CHECK --------
 
 report = ""
 
@@ -99,51 +126,40 @@ for product in products:
 
     try:
 
-        r = requests.get(product["url"],headers=headers)
+        r = requests.get(product["url"],headers=headers,timeout=20)
 
         soup = BeautifulSoup(r.text,"html.parser")
 
-        price_text = soup.get_text()
-
-        price = None
-
-        for word in price_text.split():
-
-            if "₹" in word:
-
-                price = int(word.replace("₹","").replace(",",""))
-
-                break
+        price = extract_price(soup.get_text())
 
         if price:
 
             report += f"{product['name']} : ₹{price}\n"
 
+            last_price = price_memory.get(product["name"])
+
+            alert = False
+
             if "min" in product and "max" in product:
 
                 if product["min"] <= price <= product["max"]:
 
-                    send_mail(
-
-                    "🔥 Price Drop Alert",
-
-f"""
-{product['name']}
-
-Price : ₹{price}
-
-Buy Now
-{product['url']}
-"""
-                    )
+                    if last_price is None or price < last_price:
+                        alert = True
 
             elif "max" in product:
 
                 if price <= product["max"]:
 
-                    send_mail(
+                    if last_price is None or price < last_price:
+                        alert = True
 
-                    "🔥 Price Drop Alert",
+
+            if alert:
+
+                send_mail(
+
+                "🔥 Smart Price Drop Alert",
 
 f"""
 {product['name']}
@@ -153,11 +169,19 @@ Price : ₹{price}
 Buy Now
 {product['url']}
 """
-                    )
+                )
+
+            price_memory[product["name"]] = price
 
     except:
 
         pass
+
+
+with open(price_memory_file,"w") as f:
+
+    json.dump(price_memory,f)
+
 
 # -------- DAILY REPORT --------
 
@@ -170,4 +194,4 @@ if now.hour == 19 and now.minute < 5:
     "📊 Daily Price Report",
 
 report
-                )
+    )
