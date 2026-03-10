@@ -7,15 +7,21 @@ URL = "https://www.flipkart.com/apple-iphone-16-pro-desert-titanium-128-gb/p/itm
 
 TARGET_PRICE = 89000
 
-EMAIL = "rahulraj620210@gmail.com"
-PASSWORD = "RAHULRAJ@999"
+EMAIL = "bhaiyamax080@gmail.com"
+PASSWORD = "abcd efgh ijkl mnop"
 
 headers = {
     "User-Agent": "Mozilla/5.0"
 }
 
 # -------- TEST EMAIL --------
-msg = MIMEText("✅ System working!\n\nPrice tracker activate ho gaya hai.\nAb jab price ₹89000 ya usse kam hoga tab main turant email bhej dungi.")
+
+msg = MIMEText(
+"✅ System working!\n\n"
+"Price tracker activate ho gaya hai.\n"
+"Ab jab price ₹89000 ya usse kam hoga tab main turant email bhej dungi."
+)
+
 msg["Subject"] = "iPhone Price Tracker Activated"
 msg["From"] = EMAIL
 msg["To"] = EMAIL
@@ -26,7 +32,7 @@ server.login(EMAIL, PASSWORD)
 server.sendmail(EMAIL, EMAIL, msg.as_string())
 server.quit()
 
-print("Test email sent successfully")
+print("Test email sent")
 
 # -------- PRICE CHECK --------
 
@@ -43,7 +49,12 @@ if price_tag:
 
     if price <= TARGET_PRICE:
 
-        msg = MIMEText(f"🔥 Price Drop!\n\nCurrent Price: ₹{price}\n\nBuy now:\n{URL}")
+        msg = MIMEText(
+        f"🔥 Price Drop Alert!\n\n"
+        f"Current Price: ₹{price}\n\n"
+        f"Buy now:\n{URL}"
+        )
+
         msg["Subject"] = "iPhone Price Drop Alert"
         msg["From"] = EMAIL
         msg["To"] = EMAIL
