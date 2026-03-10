@@ -11,8 +11,24 @@ EMAIL = "rahulraj620210@gmail.com"
 PASSWORD = "RAHULRAJ@999"
 
 headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    "User-Agent": "Mozilla/5.0"
 }
+
+# -------- TEST EMAIL --------
+msg = MIMEText("✅ System working!\n\nPrice tracker activate ho gaya hai.\nAb jab price ₹89000 ya usse kam hoga tab main turant email bhej dungi.")
+msg["Subject"] = "iPhone Price Tracker Activated"
+msg["From"] = EMAIL
+msg["To"] = EMAIL
+
+server = smtplib.SMTP("smtp.gmail.com", 587)
+server.starttls()
+server.login(EMAIL, PASSWORD)
+server.sendmail(EMAIL, EMAIL, msg.as_string())
+server.quit()
+
+print("Test email sent successfully")
+
+# -------- PRICE CHECK --------
 
 response = requests.get(URL, headers=headers, timeout=20)
 
@@ -21,13 +37,14 @@ soup = BeautifulSoup(response.text, "html.parser")
 price_tag = soup.find("div", {"class": "Nx9bqj CxhGGd"})
 
 if price_tag:
+
     price = int(price_tag.text.replace("₹","").replace(",",""))
     print("Current price:", price)
 
     if price <= TARGET_PRICE:
 
-        msg = MIMEText(f"Price dropped to ₹{price}\n{URL}")
-        msg["Subject"] = "iPhone Price Alert"
+        msg = MIMEText(f"🔥 Price Drop!\n\nCurrent Price: ₹{price}\n\nBuy now:\n{URL}")
+        msg["Subject"] = "iPhone Price Drop Alert"
         msg["From"] = EMAIL
         msg["To"] = EMAIL
 
@@ -37,10 +54,7 @@ if price_tag:
         server.sendmail(EMAIL, EMAIL, msg.as_string())
         server.quit()
 
-        print("Email sent")
-
-    else:
-        print("Price still high")
+        print("Price alert email sent")
 
 else:
     print("Price not found")
