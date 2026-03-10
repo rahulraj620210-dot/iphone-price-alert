@@ -8,7 +8,7 @@ import re
 import json
 
 EMAIL = "bhaiyamax080@gmail.com"
-PASSWORD = "mkfkvzkygcbgqulo"
+PASSWORD = "ryymqhgwolkemngv"
 
 products = [
 
